@@ -93,7 +93,14 @@ describe("React Native Raw Bottom Sheet", () => {
 
     it("should onClose callback function called", () => {
       wrapper.instance().close();
-      expect(onClose).toHaveBeenCalled();
+      expect(onClose.mock.calls.length).toBe(2);
+    });
+
+    it('should call close callback once', () => {
+      const cb = jest.fn();
+      wrapper.instance().close(cb);
+      wrapper.instance().close();
+      expect(cb.mock.calls.length).toBe(1);
     });
   });
 

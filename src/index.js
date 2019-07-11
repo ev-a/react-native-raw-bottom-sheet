@@ -43,6 +43,8 @@ class RBSheet extends Component {
           animatedHeight: new Animated.Value(0)
         });
 
+        if (typeof this.closeCallback === 'function') this.closeCallback();
+        this.closeCallback = null;
         if (typeof onClose === "function") onClose();
       });
     }
@@ -72,7 +74,8 @@ class RBSheet extends Component {
     this.setModalVisible(true);
   }
 
-  close() {
+  close(callback) {
+    this.closeCallback = callback;
     this.setModalVisible(false);
   }
 
