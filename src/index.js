@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { View, Modal, TouchableOpacity, Animated, PanResponder } from "react-native";
+import { View, Modal, TouchableOpacity, Animated, PanResponder, Easing } from "react-native";
 import styles from "./style";
 
 const SUPPORTED_ORIENTATIONS = [
@@ -24,18 +24,28 @@ class RBSheet extends Component {
   }
 
   setModalVisible(visible) {
-    const { height, minClosingHeight, duration, onClose } = this.props;
+    const {
+      height,
+      minClosingHeight,
+      duration,
+      onClose,
+      easing,
+      openDuration,
+      closeDuration
+    } = this.props;
     const { animatedHeight, pan } = this.state;
     if (visible) {
       this.setState({ modalVisible: visible });
       Animated.timing(animatedHeight, {
         toValue: height,
-        duration
+        duration: openDuration || duration,
+        easing: easing || Easing.linear
       }).start();
     } else {
       Animated.timing(animatedHeight, {
         toValue: minClosingHeight,
-        duration
+        duration: closeDuration || duration,
+        easing: easing || Easing.linear
       }).start(() => {
         pan.setValue({ x: 0, y: 0 });
         this.setState({
@@ -43,7 +53,7 @@ class RBSheet extends Component {
           animatedHeight: new Animated.Value(0)
         });
 
-        if (typeof this.closeCallback === 'function') this.closeCallback();
+        if (typeof this.closeCallback === "function") this.closeCallback();
         this.closeCallback = null;
         if (typeof onClose === "function") onClose();
       });
@@ -119,11 +129,14 @@ RBSheet.propTypes = {
   height: PropTypes.number,
   minClosingHeight: PropTypes.number,
   duration: PropTypes.number,
+  openDuration: PropTypes.number,
+  closeDuration: PropTypes.number,
   closeOnDragDown: PropTypes.bool,
   closeOnPressMask: PropTypes.bool,
   customStyles: PropTypes.objectOf(PropTypes.object),
   onClose: PropTypes.func,
-  children: PropTypes.node
+  children: PropTypes.node,
+  easing: PropTypes.func
 };
 
 RBSheet.defaultProps = {
@@ -131,11 +144,14 @@ RBSheet.defaultProps = {
   height: 260,
   minClosingHeight: 0,
   duration: 300,
+  openDuration: null,
+  closeDuration: null,
   closeOnDragDown: false,
   closeOnPressMask: true,
   customStyles: {},
   onClose: null,
-  children: <View />
+  children: <View />,
+  easing: null
 };
 
 export default RBSheet;
