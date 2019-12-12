@@ -1,6 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { View, Modal, TouchableOpacity, Animated, PanResponder, Easing } from "react-native";
+import {
+  View,
+  KeyboardAvoidingView,
+  Modal,
+  TouchableOpacity,
+  Animated,
+  PanResponder,
+  Platform,
+  Easing
+} from "react-native";
 import styles from "./style";
 
 const SUPPORTED_ORIENTATIONS = [
@@ -90,7 +99,14 @@ class RBSheet extends Component {
   }
 
   render() {
-    const { animationType, closeOnPressMask, children, customStyles } = this.props;
+    const {
+      animationType,
+      closeOnDragDown,
+      closeOnPressMask,
+      closeOnPressBack,
+      children,
+      customStyles
+    } = this.props;
     const { animatedHeight, pan, modalVisible } = this.state;
     const panStyle = {
       transform: pan.getTranslateTransform()
@@ -103,22 +119,31 @@ class RBSheet extends Component {
         visible={modalVisible}
         supportedOrientations={SUPPORTED_ORIENTATIONS}
         onRequestClose={() => {
-          this.setModalVisible(false);
+          if (closeOnPressBack) this.setModalVisible(false);
         }}
       >
-        <View style={[styles.wrapper, customStyles.wrapper]}>
+        <KeyboardAvoidingView
+          enabled={Platform.OS === "ios"}
+          behavior="padding"
+          style={[styles.wrapper, customStyles.wrapper]}
+        >
           <TouchableOpacity
             style={styles.mask}
             activeOpacity={1}
-            onPress={() => (closeOnPressMask ? this.close() : {})}
+            onPress={() => (closeOnPressMask ? this.close() : null)}
           />
           <Animated.View
             {...this.panResponder.panHandlers}
-            style={[panStyle, styles.container, customStyles.container, { height: animatedHeight }]}
+            style={[panStyle, styles.container, { height: animatedHeight }, customStyles.container]}
           >
+            {closeOnDragDown && (
+              <View style={styles.draggableContainer}>
+                <View style={[styles.draggableIcon, customStyles.draggableIcon]} />
+              </View>
+            )}
             {children}
           </Animated.View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     );
   }
@@ -133,6 +158,7 @@ RBSheet.propTypes = {
   closeDuration: PropTypes.number,
   closeOnDragDown: PropTypes.bool,
   closeOnPressMask: PropTypes.bool,
+  closeOnPressBack: PropTypes.bool,
   customStyles: PropTypes.objectOf(PropTypes.object),
   onClose: PropTypes.func,
   children: PropTypes.node,
@@ -148,6 +174,7 @@ RBSheet.defaultProps = {
   closeDuration: null,
   closeOnDragDown: false,
   closeOnPressMask: true,
+  closeOnPressBack: true,
   customStyles: {},
   onClose: null,
   children: <View />,

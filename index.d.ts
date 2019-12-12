@@ -1,5 +1,5 @@
-import * as React from "react";
-import { StyleProp, ViewStyle, Animated } from "react-native";
+import { Component } from "react";
+import { StyleProp, ViewStyle } from "react-native";
 
 declare module "react-native-raw-bottom-sheet" {
   export type RBSheetProps = {
@@ -9,17 +9,17 @@ declare module "react-native-raw-bottom-sheet" {
     duration?: number;
     closeOnDragDown?: boolean;
     closeOnPressMask?: boolean;
+    closeOnPressBack?: boolean;
     onClose?: () => void;
     customStyles?: {
       wrapper?: StyleProp<ViewStyle>;
-      container?: StyleProp<Animated.View>;
+      container?: StyleProp<ViewStyle>;
+      draggableIcon?: StyleProp<ViewStyle>;
     };
   };
 
-  class RBSheet extends React.Component<RBSheetProps> {
+  export default class RBSheet extends Component<RBSheetProps> {
     open(): void;
     close(): void;
   }
-
-  export default RBSheet;
 }
