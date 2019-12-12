@@ -47,13 +47,13 @@ class RBSheet extends Component {
       this.setState({ modalVisible: visible });
       Animated.timing(animatedHeight, {
         toValue: height,
-        duration: openDuration || duration,
+        duration: typeof openDuration === "number" ? openDuration : duration,
         easing: easing || Easing.linear
       }).start();
     } else {
       Animated.timing(animatedHeight, {
         toValue: minClosingHeight,
-        duration: closeDuration || duration,
+        duration: typeof closeDuration === "number" ? closeDuration : duration,
         easing: easing || Easing.linear
       }).start(() => {
         pan.setValue({ x: 0, y: 0 });
